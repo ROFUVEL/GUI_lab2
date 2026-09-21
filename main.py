@@ -1,20 +1,24 @@
 import re
 
-class Point:
+class Shape:
+    def __str__(self):
+        raise NotImplementedError
+
+class Point(Shape):
     def __init__(self, x: float, y: float):
         self.x = x
         self.y = y
     def __str__(self):
         return f"Point({self.x}, {self.y})"
 
-class Line:
+class Line(Shape):
     def __init__(self, start: Point, end: Point):
         self.start = start
         self.end = end
     def __str__(self):
         return f"Line({self.start}, {self.end})"
 
-class Circle:
+class Circle(Shape):
     def __init__(self, center: Point, radius: float):
         self.center = center
         self.radius = radius
@@ -49,9 +53,33 @@ def parse_line(line: str):
 
     return None
 
-# def main():
-#     p = Point(3.4, 5.5)
-#     print(p)
-#
-# if __name__ == '__main__':
-#     main()
+def read_shapes(filepath: str) -> list:
+    shapes = []
+
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+
+                if not line:
+                    continue
+                result = parse_line(line)
+
+                if result is not None:
+                    shapes.append(result)
+                else:
+                    print(f"некорректное описание объектов. '{line}'")
+
+    except FileNotFoundError:
+        print(f"Ошибка: файл '{filepath}' не найден")
+        exit(66) # 66 - ошибка отсутствующего файла (на будущее)
+
+    return shapes
+
+def main():
+    test = "Point(3, 4)"
+    parsed = parse_line(test)
+    print(parsed)
+
+if __name__ == '__main__':
+    main()
