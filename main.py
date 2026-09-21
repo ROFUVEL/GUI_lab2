@@ -1,4 +1,5 @@
 import re
+import argparse
 
 class Shape:
     def __str__(self):
@@ -76,10 +77,31 @@ def read_shapes(filepath: str) -> list:
 
     return shapes
 
+
+
 def main():
-    test = "Point(3, 4)"
-    parsed = parse_line(test)
-    print(parsed)
+    shapes = read_shapes("data.txt")
+    for s in shapes:
+        print(s)
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description="Программа для обработки геометрических фигур из файла"
+    )
+
+    parser.add_argument(
+        "-f", "--file",
+        required=True, help="Путь к файлу с фигурами"
+    )
+
+    parser.add_argument(
+        "-o",
+        "--oper",
+        required=True,
+        choices=["print", "count"],
+        help="Операция над списком фигур: print или count",
+    )
+
+    args = parser.parse_args()
+
     main()
