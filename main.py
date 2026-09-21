@@ -77,12 +77,20 @@ def read_shapes(filepath: str) -> list:
 
     return shapes
 
+def operation_print(shapes: list) -> None:
+    if not shapes:
+        print("Список фигур пуст")
+        return
 
+    for shape in shapes:
+        print(shape)
+
+
+def operation_print_count(shapes: list) -> None:
+    print(f"Количество фигур: {len(shapes)}")
 
 def main():
     shapes = read_shapes("data.txt")
-    for s in shapes:
-        print(s)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
