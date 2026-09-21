@@ -1,5 +1,6 @@
 import re
 import argparse
+import sys
 
 class Shape:
     def __str__(self):
@@ -73,8 +74,8 @@ def read_shapes(filepath: str) -> list:
 
     except FileNotFoundError:
         print(f"Ошибка: файл '{filepath}' не найден")
-        exit(66) # 66 - ошибка отсутствующего файла (на будущее)
-
+        sys.exit(66) # обчный exit - интерактивно в консоль, sys.exit - ошибка в запуске скрипта (как в этой лабе)
+                     # - ошибка отсутствующего файла (на будущее)
     return shapes
 
 def operation_print(shapes: list) -> None:
@@ -85,31 +86,40 @@ def operation_print(shapes: list) -> None:
     for shape in shapes:
         print(shape)
 
-
 def operation_print_count(shapes: list) -> None:
     print(f"Количество фигур: {len(shapes)}")
 
-def main():
-    shapes = read_shapes("data.txt")
-
-if __name__ == '__main__':
+def create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Программа для обработки геометрических фигур из файла"
+        description='Программа для обработки геометрических фигур из файла'
     )
 
     parser.add_argument(
-        "-f", "--file",
-        required=True, help="Путь к файлу с фигурами"
-    )
-
-    parser.add_argument(
-        "-o",
-        "--oper",
+        '-f', '--file',
         required=True,
-        choices=["print", "count"],
-        help="Операция над списком фигур: print или count",
+        help='Путь к файлу с фигурами'
     )
 
+    parser.add_argument(
+        '-o', '--oper',
+        required=True,
+        choices=['print', 'count'],
+        help='Операция над списком фигур: print или count'
+    )
+
+    return parser
+
+def main():
+    parser = create_parser()
     args = parser.parse_args()
 
+    shapes = read_shapes(args.file)
+
+    operations = {
+        'print': operation_print,
+        'count': operation_print_count,
+    }
+    operations[args.oper](shapes)
+
+if __name__ == '__main__':
     main()
