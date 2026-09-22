@@ -1,8 +1,6 @@
 import re
 import argparse
 import sys
-import turtle
-
 
 class Shape:
     def __str__(self):
@@ -43,18 +41,27 @@ def parse_line(line: str):
     match = pattern_point.match(line)
     if match:
         x, y = float(match.group(1)), float(match.group(2))
-        return Point(x, y)
+        color = (int(match.group(3)), int(match.group(4)), int(match.group(5)))
+        return Point(x, y, color)
 
     match = pattern_line.match(line)
     if match:
-        start = Point(float(match.group(1)), float(match.group(2)))
-        end   = Point(float(match.group(3)), float(match.group(4)))
-        return Line(start, end)
+        color1 = (int(match.group(3)), int(match.group(4)), int(match.group(5)))
+        start = Point(float(match.group(1)), float(match.group(2)), color1)
 
+        color2 = (int(match.group(8)), int(match.group(9)), int(match.group(10)))
+        end = Point(float(match.group(6)), float(match.group(7)), color2)
+        return Line(start, end)
+    
     match = pattern_circle.match(line)
     if match:
-        center = Point(float(match.group(1)), float(match.group(2)))
-        radius = float(match.group(3))
+        color_center = (
+            int(match.group(3)),
+            int(match.group(4)),
+            int(match.group(5)),
+        )
+        center = Point(float(match.group(1)), float(match.group(2)), color_center)
+        radius = float(match.group(6))
         return Circle(center, radius)
 
     return None
@@ -93,6 +100,11 @@ def operation_print(shapes: list) -> None:
 def operation_print_count(shapes: list) -> None:
     print(f"Количество фигур: {len(shapes)}")
 
+# def operation_remove(shapes: list) -> None:
+#     for shap in  shapes:
+#         if shap.color =
+
+
 def create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description='Программа для обработки геометрических фигур из файла'
@@ -107,7 +119,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         '-o', '--oper',
         required=True,
-        choices=['print', 'count'],
+        choices=['print', 'count', 'remove'],
         help='Операция над списком фигур: print или count'
     )
 
@@ -122,6 +134,7 @@ def main():
     operations = {
         'print': operation_print,
         'count': operation_print_count,
+        # 'remove': operation_remove()
     }
     operations[args.oper](shapes)
 
