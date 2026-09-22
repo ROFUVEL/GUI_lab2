@@ -52,7 +52,7 @@ def parse_line(line: str):
         color2 = (int(match.group(8)), int(match.group(9)), int(match.group(10)))
         end = Point(float(match.group(6)), float(match.group(7)), color2)
         return Line(start, end)
-    
+
     match = pattern_circle.match(line)
     if match:
         color_center = (
@@ -100,9 +100,49 @@ def operation_print(shapes: list) -> None:
 def operation_print_count(shapes: list) -> None:
     print(f"Количество фигур: {len(shapes)}")
 
-# def operation_remove(shapes: list) -> None:
-#     for shap in  shapes:
-#         if shap.color =
+def operation_remove_from_file(filepath: str, target_color: tuple) -> None:
+
+    def has_color(shape, color):
+        if isinstance(shape, Point):
+            return shape.color == color
+        if isinstance(shape, Line):
+            return shape.start.color == color or shape.end.color == color
+        if isinstance(shape, Circle):
+            return shape.center.color == color
+        return False
+
+    lines_to_keep = []
+    removed_count = 0
+
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        for line in lines:
+            cleaned_line = line.strip()
+
+            if not cleaned_line:
+                lines_to_keep.append(line)
+                continue
+
+            shape = parse_line(cleaned_line)
+
+            if shape and has_color(shape, target_color):
+                removed_count += 1
+                continue
+
+            lines_to_keep.append(line)
+
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.writelines(lines_to_keep)
+
+        print(
+            f"Операция завершена. Из файла '{filepath}' удалено строк: {removed_count}"
+        )
+
+    except FileNotFoundError:
+        print(f"Ошибка: файл '{filepath}' не найден", file=sys.stderr)
+        sys.exit(66)
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -120,7 +160,15 @@ def create_parser() -> argparse.ArgumentParser:
         '-o', '--oper',
         required=True,
         choices=['print', 'count', 'remove'],
-        help='Операция над списком фигур: print или count'
+        help='Операция над списком фигур: print или count или remove'
+    )
+
+    parser.add_argument(
+        "--color",
+        type=int,
+        nargs=3,
+        metavar=("R", "G", "B"),
+        help="Цвет RGB для операции удаления (например: --color 255 255 255)",
     )
 
     return parser
@@ -129,14 +177,22 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
 
-    shapes = read_shapes(args.file)
+    if args.oper == "remove" and not args.color:
+        print(
+            "Ошибка: для операции 'remove' необходимо указать цвет с помощью флага --color R G B",
+            file=sys.stderr,
+        )
+        sys.exit(64) # 64 - ошибка командной строки
 
-    operations = {
-        'print': operation_print,
-        'count': operation_print_count,
-        # 'remove': operation_remove()
-    }
-    operations[args.oper](shapes)
+    if args.oper == "remove":
+        target_color = tuple(args.color)
+        operation_remove_from_file(args.file, target_color)
+    else:
+        shapes = read_shapes(args.file)
+        if args.oper == "print":
+            operation_print(shapes)
+        elif args.oper == "count":
+            operation_print_count(shapes)
 
 if __name__ == '__main__':
     main()
