@@ -1,17 +1,20 @@
 import re
 import argparse
 import sys
+import turtle
+
 
 class Shape:
     def __str__(self):
         raise NotImplementedError
 
 class Point(Shape):
-    def __init__(self, x: float, y: float):
+    def __init__(self, x: float, y: float, color: tuple = (0, 0, 0)):
         self.x = x
         self.y = y
+        self.color = color
     def __str__(self):
-        return f"Point({self.x}, {self.y})"
+        return f"Point({self.x}, {self.y}, цвет={self.color})"
 
 class Line(Shape):
     def __init__(self, start: Point, end: Point):
@@ -28,7 +31,8 @@ class Circle(Shape):
         return f"Circle({self.center}, {self.radius})"
 
 num = r'[+-]?\d+(?:\.\d+)?'
-point = rf'Point\(\s*({num})\s*,\s*({num})\s*\)'
+col = r"(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)"
+point = rf'Point\(\s*({num})\s*,\s*({num})\s*,\s*({col})\s*,\s*({col})\s*,\s*({col})\s*\)'
 
 pattern_point = re.compile(rf'^\s*{point}\s*$')
 pattern_line = re.compile(rf'^\s*Line\(\s*{point}\s*,\s*{point}\s*\)\s*$')

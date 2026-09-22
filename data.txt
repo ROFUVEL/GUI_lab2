@@ -1,4 +1,4 @@
-Point(3.4, 5.5)
+Point(3.4, 5.5, 255,255,255)
 Line(Point(1.2, 3.4), Point(5, 6))
 
 Circle(Point(5, 6), 7)
